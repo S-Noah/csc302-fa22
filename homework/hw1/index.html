@@ -18,6 +18,12 @@
                 var item_cell = row.insertCell(0);
                 var priority_cell = row.insertCell(1);
                 var category_cell = row.insertCell(2);
+                var button_cell = row.insertCell(3);
+                var btn = document.createElement('input');
+                btn.type = "button";
+                btn.className = "remove-item";
+                btn.value = "X";
+                button_cell.appendChild(btn);
 
                 item_cell.classList.add("item-col");
                 priority_cell.classList.add("priority-col");
