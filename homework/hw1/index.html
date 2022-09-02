@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tododles</title>
+
+    <script src="sort-table.min.js"></script>
+
+    <script>
+        function addTodoRow(){
+            var table = document.getElementById("todo-table");
+            var new_item = document.getElementById("new-item");
+            var new_priority = document.getElementById("new-priority");
+            var new_category = document.getElementById("new-category");
+            if(new_item != "" && new_priority != null && new_category != ""){
+                var row = table.insertRow(-1);
+                var item_cell = row.insertCell(0);
+                var priority_cell = row.insertCell(1);
+                var category_cell = row.insertCell(2);
+
+                item_cell.classList.add("item-col");
+                priority_cell.classList.add("priority-col");
+                category_cell.classList.add("category-col");
+
+                item_cell.innerHTML = new_item.value;
+                priority_cell.innerHTML = new_priority.value;
+                category_cell.innerHTML = new_category.value;
+
+                new_item.value = "";
+                new_priority.value = null;
+                new_category.value = "";
+
+                
+            }
+        }
+    </script>
+
+    <style>
+        .item-col, #new-item {
+            width: 200px;
+            height: 40px;
+            background-color: cyan;
+            border: 1px solid black;
+            border-collapse: collapse; 
+        }
+
+        .priority-col, #new-priority {
+            width: 120px;
+            height: 40px;
+            background-color: cyan;
+            text-align: center;
+            border: 1px solid black;
+            border-collapse: collapse; 
+        }
+        .category-col, #new-category {
+            width: 200px;
+            height: 40px;
+            background-color: cyan;
+            border: 1px solid black;
+            border-collapse: collapse; 
+            
+        }
+        #todo-table {
+            padding-left: 0.4em;
+             
+        }
+    </style>
+</head>
+<body>
+    <h1>Tododles</h1>
+
+    <table>
+        <tr>
+            <th class="item-col">Item</th>
+            <th class="priority-col">Priority</th>
+            <th class="category-col">Category</th>
+            <th></th>
+        </tr>
+
+        <tr>
+            <td><input type="text" id="new-item"/></td>
+            <td><input type="number" id="new-priority"/></td>
+            <td><input type="text" id="new-category"/></td>
+            <td><button id="submit-button" onclick="addTodoRow()">Add</button></td>
+        </tr>
+    </table>
+
+    <table id="todo-table" class="js-sort-table">
+        <tr>
+            <th class="item-col">Item</th>
+            <th class="priority-col">Priority</th>
+            <th class="category-col">Category</th>
+            <th></th>
+        </tr>
+
+        <tr>
+            <td class="item-col">do homework</td>
+            <td class="priority-col">3</td>
+            <td class="category-col">school</td>
+            <td><button class="remove-item">X</button></td>
+        </tr>
+
+        <tr>
+            <td class="item-col">catch up with friends</td>
+            <td class="priority-col">2</td>
+            <td class="category-col">social</td>
+            <td><button class="remove-item">X</button></td>
+        </tr>
+
+        <tr>
+            <td class="item-col">call mom</td>
+            <td class="priority-col">1</td>
+            <td class="category-col">family</td>
+            <td><button class="remove-item">X</button></td>
+        </tr>
+
+    </table>
+</body>
+</html>
