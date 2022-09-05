@@ -4,49 +4,146 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tododles</title>
+    <script> 
+        var last_sort_index = null;
+        var sort_orientation = 1;
+        
+        function updateData(table){
+            var jsonTextArea = document.getElementById("json-data");
+            var rows = table.rows
+            var data = [];
+            for (let i = 0; i < rows.length - 1; i++){
+                var cells = rows[i + 1].cells;
+                data[i] = [];
+                for(let j = 0; j < cells.length - 1; j++){
+                    data[i][j] = cells[j].innerHTML;
+                }
+            }
+            jsonTextArea.value = JSON.stringify(data, null, ' ');
+            return data;
+        }
+        function clearTable(table){
+            var length = table.rows.length
+            for (let i = 1; i < length; i++){
+                table.deleteRow(1)
+            }
+        }
+        function removeTodoRow(row){
+            var table = document.getElementById("todo-table")
+            table.deleteRow(row.rowIndex)
+            updateData(table);
+        }
+        function addTodoRow(new_item, new_priority, new_category){
+            var table = document.getElementById("todo-table");
+            var num_rows = table.rows.length
+            var row = table.insertRow(-1);
+            var item_cell = row.insertCell(0);
+            var priority_cell = row.insertCell(1);
+            var category_cell = row.insertCell(2);
+            var button_cell = row.insertCell(3);
+            var btn = document.createElement('input');
+            btn.type = "button";
+            btn.className = "remove-item";
+            btn.value = "X";
+            btn.addEventListener("click", () => removeTodoRow(row))
+            button_cell.appendChild(btn);
+            item_cell.className = "item-col";
+            priority_cell.className = "priority-col";
+            category_cell.className = "category-col";
 
-    <script src="sort-table.min.js"></script>
-
-    <script>
-        function addTodoRow(){
+            item_cell.innerHTML = new_item;
+            priority_cell.innerHTML = new_priority;
+            category_cell.innerHTML = new_category;
+            updateData(table);
+        }
+        function submitEvent(){
             var table = document.getElementById("todo-table");
             var new_item = document.getElementById("new-item");
             var new_priority = document.getElementById("new-priority");
             var new_category = document.getElementById("new-category");
-            if(new_item != "" && new_priority != null && new_category != ""){
-                var row = table.insertRow(-1);
-                var item_cell = row.insertCell(0);
-                var priority_cell = row.insertCell(1);
-                var category_cell = row.insertCell(2);
-                var button_cell = row.insertCell(3);
-                var btn = document.createElement('input');
-                btn.type = "button";
-                btn.className = "remove-item";
-                btn.value = "X";
-                button_cell.appendChild(btn);
-
-                item_cell.classList.add("item-col");
-                priority_cell.classList.add("priority-col");
-                category_cell.classList.add("category-col");
-
-                item_cell.innerHTML = new_item.value;
-                priority_cell.innerHTML = new_priority.value;
-                category_cell.innerHTML = new_category.value;
-
+            if(new_item.value != "" && new_priority.value != null && new_category.value != ""){
+                addTodoRow(new_item.value, new_priority.value, new_category.value);
                 new_item.value = "";
                 new_priority.value = null;
                 new_category.value = "";
-
-                
+            }
+        }   
+        function loadTodoFromJson(json){
+            for(let i = 0; i < json.length; i++){
+                addTodoRow(json[i][0], json[i][1], json[i][2])
             }
         }
-    </script>
+        function sort_table(sort_index){
+            sort_orientation = (last_sort_index == sort_index)? sort_orientation * -1: 1;
+            last_sort_index = sort_index;
+     
+            var table = document.getElementById("todo-table");
+            var jsonTextArea = document.getElementById("json-data");
+            var rows = table.rows;
+            var headers = rows[0].cells;
+            headers[0].innerHTML = "Item";
+            headers[1].innerHTML = "Priority";
+            headers[2].innerHTML = "Category";
+            headers[sort_index].innerHTML += (sort_orientation > 0)? "\u25B2":"\u25BC";
+            // Copy the data from the table into the json format.
+            // Exclude the headers.
+            
+            if(rows.length > 1){
+                var data = updateData(table)
+                // delete all rows, excluding headers.
+                clearTable(table);
+                // Sort the data based off the given sortIndex.
+                data.sort((a, b) => {
+                    var valA = a[sort_index]
+                    var valB = b[sort_index]
+                    if (valA < valB) {
+                        return -1 * sort_orientation;
+                    }
+                    if (valA > valB) {
+                        return 1 * sort_orientation;   
+                    }
+                    return 0;
+                });
+                // Load new data into the table.
+                loadTodoFromJson(data);
+                jsonTextArea.value = JSON.stringify(data, null, ' ');
+            }
+        }
+        function loadEvent(){
+            var jsonTextArea = document.getElementById("json-data");
+            var json = jsonTextArea.value;
+            var o = JSON.parse(json);
+            clearTable(document.getElementById("todo-table"))
+            loadTodoFromJson(o);
+        }
+        function loadDemoEvent(){
+            var demo_data = [
+                [
+                    "do homework",
+                    "3",
+                    "school"
+                ],
+                [
+                    "catch up with friends",
+                    "2",
+                    "social"
+                ],
+                [
+                    "call mom",
+                    "1",
+                    "family"
+                ]
+            ]
+            clearTable(document.getElementById("todo-table"))
+            loadTodoFromJson(demo_data);
+        }
+    </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
     <style>
         .item-col, #new-item {
             width: 200px;
             height: 40px;
-            background-color: cyan;
+            background-color: beige;
             border: 1px solid black;
             border-collapse: collapse; 
         }
@@ -54,7 +151,7 @@
         .priority-col, #new-priority {
             width: 120px;
             height: 40px;
-            background-color: cyan;
+            background-color: beige;
             text-align: center;
             border: 1px solid black;
             border-collapse: collapse; 
@@ -62,20 +159,23 @@
         .category-col, #new-category {
             width: 200px;
             height: 40px;
-            background-color: cyan;
+            background-color: beige;
             border: 1px solid black;
             border-collapse: collapse; 
             
         }
         #todo-table {
-            padding-left: 0.4em;
-             
+            padding-left: 0.0em;
+        }
+        #json-data {
+            width: 40em;
+            height: 25em;
         }
     </style>
 </head>
 <body>
     <h1>Tododles</h1>
-
+    <h2>Add new Tododle.</h2>
     <table>
         <tr>
             <th class="item-col">Item</th>
@@ -83,30 +183,30 @@
             <th class="category-col">Category</th>
             <th></th>
         </tr>
-
         <tr>
             <td><input type="text" id="new-item"/></td>
             <td><input type="number" id="new-priority"/></td>
             <td><input type="text" id="new-category"/></td>
-            <td><button id="submit-button" onclick="addTodoRow()">Add</button></td>
+            <td><button id="submit-button" onclick="submitEvent()">Add</button></td>
         </tr>
     </table>
-
-    <table id="todo-table" class="js-sort-table">
+    <h2>Your Tododles.</h2>
+    <table id="todo-table">
         <tr>
-            <th class="item-col">Item</th>
-            <th class="priority-col">Priority</th>
-            <th class="category-col">Category</th>
+            <th onclick="sort_table(0)" class="item-col">Item</th>
+            <th onclick="sort_table(1)" class="priority-col">Priority</th>
+            <th onclick="sort_table(2)" class="category-col">Category</th>
             <th></th>
         </tr>
-
+        <!--
         <tr>
+            
             <td class="item-col">do homework</td>
             <td class="priority-col">3</td>
             <td class="category-col">school</td>
             <td><button class="remove-item">X</button></td>
         </tr>
-
+        
         <tr>
             <td class="item-col">catch up with friends</td>
             <td class="priority-col">2</td>
@@ -120,7 +220,11 @@
             <td class="category-col">family</td>
             <td><button class="remove-item">X</button></td>
         </tr>
-
+        -->
     </table>
+    <h2>JSON Tododles.</h2>    
+    <textarea id="json-data"></textarea>
+    <button id="load" onclick="loadEvent()">Load</button>
+    <button id="grading-demo" onclick="loadDemoEvent()">Load Grading Demo</button>
 </body>
 </html>
