@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzer</title>
+    <script src="jquery-3.6.1.js"></script>
+    <script> 
+        var questions;
+        var example = [
+            {"q":"What is 5+5?", "a":"10"},
+            {"q":"What is the capital of MA?", "a":"Boston"}
+        ];
+
+        function save(){
+            localStorage.setItem("questions", JSON.stringify(questions))
+        }
+
+        function load(){
+            var data = localStorage.getItem("questions");
+            if (data == null){
+              questions = example;
+            }
+            else{
+                questions = JSON.parse(data);
+            }
+            console.log(questions);
+            renderQuizList();
+            renderQuizTable()
+        }
+        $(document).ready(load);
+
+        function renderQuizList(){
+            $("#quiz-list").empty();
+            for(let i = 0; i < questions.length; i++){
+                $("#quiz-list").append(`<li><h3>${questions[i].q}</h3><input type="text"></li>`);
+            }
+        }
+        function renderQuizTable(){
+            $("#quiz-table").empty();
+            $("#quiz-table").append(`<tr><th class="question-col">Question</th><th class="answer-col">Correct Answer</th><th></th></tr>`)
+            for(let i = 0; i < questions.length; i++){
+                $("#quiz-table").append(`<tr><th class="question-col">${questions[i].q}</th><th class="answer-col">${questions[i].a}</th><th><button onclick="deleteQuizItem(${i})">Delete</button></th></tr>`);
+            }
+        }
+
+        function createQuizItem(){
+            questions.push({"q":"Sample_question?", "a":"Sample_answer."});
+            save();
+            renderQuizList();
+            renderQuizTable();
+        }
+        function deleteQuizItem(i){
+            questions.removeChild(i)
+            save();
+            renderQuizList();
+            renderQuizTable();
+        }
+    </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+
+    <style>
+        .question-col, #new-item {
+            width: 200px;
+            height: 40px;
+            background-color: beige;
+            border: 1px solid black;
+            border-collapse: collapse; 
+        }
+
+        .answer-col, #new-priority {
+            width: 120px;
+            height: 40px;
+            background-color: beige;
+            border: 1px solid black;
+            border-collapse: collapse; 
+        }
+
+        #quiz-table {
+            padding-left: 0.0em;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Quizzer</h1>
+    <div>
+        <h2>Quiz</h2>
+        <ol id="quiz-list">
+            <li>
+                <h3></h3>
+                <input type="text">
+            </li>
+        </ol>
+        <button onclick="createQuizItem()">Add</button>
+        <table id="quiz-table">
+            <tr>
+                <th class="question-col">Question</th>
+                <th class="answer-col">Correct Answer</th>
+                <th></th>
+            </tr>
+        </table>
+    </div>
+    
+</body>
+</html>
