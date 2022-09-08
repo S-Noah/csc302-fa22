@@ -51,7 +51,7 @@
             renderQuizTable();
         }
         function deleteQuizItem(i){
-            questions.removeChild(i)
+            questions.splice(i, 1)
             save();
             renderQuizList();
             renderQuizTable();
