@@ -16,10 +16,12 @@
         function save(){
             localStorage.setItem("questions", JSON.stringify(questions))
         }
-
         function load(){
-            localStorage.clear();
+            //localStorage.clear();
+            var mode = location.hash.match(/^#?([^?]*)/)[1]
             var data = localStorage.getItem("questions");
+            adminMode = mode == 'admin';
+
             if (data == null){
               questions = example;
               save();
@@ -31,8 +33,10 @@
         }
         function renderQuizList(){
             $("#quiz-list").empty();
+            let i = 0;
             for(let item of questions){
-                $("#quiz-list").append(`<li><h3>${item.q}</h3><input type="text"></li>`);
+                $("#quiz-list").append(`<li class="quiz-item"><h3>${item.q}</h3><input id="guess${i}" type="text"></li>`);
+                i++;
             }
         }
         function renderQuizTable(){
@@ -71,7 +75,6 @@
                 
             }
         }
-
         function createQuizItem(){
             questions.push({"q":"Sample_question?", "a":"Sample_answer."});
             save();
@@ -100,16 +103,31 @@
             render();
         }
         function updateViews(){
-            console.log("changeing view")
             var mode = location.hash.match(/^#?([^?]*)/)[1]
             adminMode = mode == 'admin';
             load();
         }
+        function checkAnswers(){
+            var answers = $("#quiz-list input");
+            var headers = $("#quiz-list h3");
+            let i = 0;
+            
+            for(let input of answers){
+                
+                if(input.value == questions[i].a){
+                    input.style.backgroundColor = "green";
+                    headers[i].style.backgroundColor = "green";
+                }
+                else{
+                    input.style.backgroundColor = "red";
+                    headers[i].style.backgroundColor = "red";
+                }
+                i++;
+            }
+        }
 
         $(document).ready(load);
-        $(document).on('hashchange', updateViews());
-
-        
+        $(window).on('hashchange', updateViews);
     </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
     <style>
@@ -120,27 +138,23 @@
             border: 1px solid black;
             border-collapse: collapse; 
         }
+        .quiz-item{
+            width: max-content;
+        }
         #quiz-table {
             padding-left: 0.0em;
         }
         #quiz-admin-page{
             display: none;
         }
-
-
     </style>
 </head>
 <body>
     <h1 id="quiz-header">Quizzer</h1>
     <h2 id="quiz-title">Quiz</h2>
     <div id="quiz-page">
-        <ol id="quiz-list">
-            <li>
-                <h3></h3>
-                <input type="text">
-            </li>
-        </ol>
-        <button onclick="console.log('needs implementation')">Check</button>
+        <ol id="quiz-list"></ol>
+        <button onclick="checkAnswers()">Check</button>
         <button onclick="console.log('needs implementation')">Reset</button>
     </div>
     <div id="quiz-admin-page">
