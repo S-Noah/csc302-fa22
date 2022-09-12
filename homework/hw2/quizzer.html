@@ -18,28 +18,28 @@
         }
 
         function load(){
-            //localStorage.clear();
+            localStorage.clear();
             var data = localStorage.getItem("questions");
             if (data == null){
               questions = example;
+              save();
             }
             else{
                 questions = JSON.parse(data);
             }
             render()
         }
-        $(document).ready(load);
-
         function renderQuizList(){
             $("#quiz-list").empty();
-            for(let i = 0; i < questions.length; i++){
-                $("#quiz-list").append(`<li><h3>${questions[i].q}</h3><input type="text"></li>`);
+            for(let item of questions){
+                $("#quiz-list").append(`<li><h3>${item.q}</h3><input type="text"></li>`);
             }
         }
         function renderQuizTable(){
             $("#quiz-table").empty();
             $("#quiz-table").append(`<tr><th class="question-col">Question</th><th class="question-col">Correct Answer</th><th></th></tr>`)
-            for(let i = 0; i < questions.length; i++){
+            let i = 0;
+            for(let item of questions){
                 $("#quiz-table").append(
                     `<tr>
                         <th class="question-col"><input id="q${i}" type="text" value="${questions[i].q}"></th>
@@ -47,6 +47,7 @@
                         <th><button onclick="deleteQuizItem(${i})">Delete</button></th>
                     </tr>`
                     );
+                i++;
             }
         }
         function render(){
@@ -56,11 +57,18 @@
                 renderQuizTable();
                 $("#quiz-header").html("Quizzer Admin");
                 $("#quiz-title").html("");
+                $("#quiz-page").css("display", "none")
+                $("#quiz-admin-page").css("display", "block")
+                $("#mode-button").html("Quiz");
             }
             else{
                 renderQuizList();
                 $("#quiz-header").html("Quizzer");
                 $("#quiz-title").html("Quiz");
+                $("#quiz-page").css("display", "block")
+                $("#quiz-admin-page").css("display", "none")
+                $("#mode-button").html("Admin");
+                
             }
         }
 
@@ -91,6 +99,17 @@
             save();
             render();
         }
+        function updateViews(){
+            console.log("changeing view")
+            var mode = location.hash.match(/^#?([^?]*)/)[1]
+            adminMode = mode == 'admin';
+            load();
+        }
+
+        $(document).ready(load);
+        $(document).on('hashchange', updateViews());
+
+        
     </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
     <style>
@@ -104,23 +123,31 @@
         #quiz-table {
             padding-left: 0.0em;
         }
+        #quiz-admin-page{
+            display: none;
+        }
+
 
     </style>
 </head>
 <body>
     <h1 id="quiz-header">Quizzer</h1>
     <h2 id="quiz-title">Quiz</h2>
-    <div id="page">
+    <div id="quiz-page">
         <ol id="quiz-list">
             <li>
                 <h3></h3>
                 <input type="text">
             </li>
         </ol>
-        <table id="quiz-table"></table>
+        <button onclick="console.log('needs implementation')">Check</button>
+        <button onclick="console.log('needs implementation')">Reset</button>
     </div>
-    <button onclick="createQuizItem()">Add</button>
-    <button onclick="toggleAdminMode()">Admin</button>
-    <button onclick="submit()">Save</button>
+    <div id="quiz-admin-page">
+        <table id="quiz-table"></table>
+        <button onclick="createQuizItem()">Add</button>
+        <button onclick="submit()">Save</button>
+    </div>
+    <button id="mode-button" onclick="toggleAdminMode()">Admin</button>
 </body>
 </html>
