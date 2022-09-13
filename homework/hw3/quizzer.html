@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzer</title>
+    <script src="jquery-3.6.1.js"></script>
+    <script> 
+        var questions;
+        var example = [
+            {"q":"What is 5+5?", "a":"10"},
+            {"q":"What is the capital of MA?", "a":"Boston"}
+        ];
+        var adminMode = false;
+
+        var my_colors = {
+            oxford_blue:"#0a1128",
+            true_blue:"#3066be",
+            amber:"#ff7f11",
+            titanium_yellow:"#f0e100",
+            gray:"#cdd1de",
+            rose:"#FF5964",
+            pistachio:"#A1CF6B"
+        }  
+        //Model
+        function save(){
+            localStorage.setItem("questions", JSON.stringify(questions))
+        }
+        function load(){
+            var mode = location.hash.match(/^#?([^?]*)/)[1]
+            var data = localStorage.getItem("questions");
+            adminMode = mode == 'admin';
+
+            if (data == null){
+              questions = example;
+              save();
+            }
+            else{
+                questions = JSON.parse(data);
+            }
+            render()
+        }
+        function reset(){
+            localStorage.clear();
+            load();
+        }
+        function createQuizItem(){
+            questions.push({"q":"", "a":""});
+            save();
+            render();
+        }
+        function deleteQuizItem(i){
+            questions.splice(i, 1)
+            save();
+            render();
+        }
+        // View
+        function updateViews(){
+            var mode = location.hash.match(/^#?([^?]*)/)[1]
+            adminMode = mode == 'admin';
+            load();
+        }
+        function renderQuizList(){
+            $("#quiz-list").empty();
+            let i = 0;
+            for(let item of questions){
+                $("#quiz-list").append(`<li class="quiz-item"><h3>${item.q}</h3><input id="guess${i}" type="text"></li>`);
+                i++;
+            }
+        }
+        function renderQuizTable(){
+            $("#quiz-table").empty();
+            $("#quiz-table").append(`<tr><th class="question-col">Question</th><th class="question-col">Correct Answer</th><th></th></tr>`)
+            let i = 0;
+            for(let item of questions){
+                $("#quiz-table").append(
+                    `<tr>
+                        <th class="question-col"><input id="q${i}" type="text" value="${questions[i].q}"></th>
+                        <th class="question-col"><input id="a${i}" type="text" value="${questions[i].a}"></th>"
+                        <th><button onclick="deleteQuizItem(${i})">Delete</button></th>
+                    </tr>`
+                    );
+                i++;
+            }
+        }
+        function render(){
+            $("#quiz-table").empty();
+            $("#quiz-list").empty();
+            if(adminMode){
+                window.location.hash = "admin";
+                renderQuizTable();
+                $("#quiz-header").html("Quizzer Admin");
+                $("#quiz-title").html("");
+                $("#mode-button").html("Quiz");
+                $("#quiz-page").css("display", "none")
+                $("#quiz-admin-page").css("display", "block")
+                
+            }
+            else{
+                window.location.hash = "";
+                renderQuizList();
+                $("#quiz-header").html("Quizzer");
+                $("#quiz-title").html("Quiz");
+                $("#mode-button").html("Admin");
+                $("#quiz-page").css("display", "block")
+                $("#quiz-admin-page").css("display", "none") 
+            }
+        }
+        // Controller
+        function submit(){
+            for(let i = 0; i < questions.length; i++){
+                questions[i].q = $(`#q${i}`)[0].value;
+                questions[i].a = $(`#a${i}`)[0].value;
+            }
+            save();
+            render();
+        }
+        function toggleAdminMode(){
+            adminMode = !adminMode;
+            render();
+        }
+        function checkAnswers(){
+            var answers = $("#quiz-list input");
+            var headers = $("#quiz-list h3");
+            let i = 0;
+            let num_correct = 0;
+            for(let input of answers){
+                if(input.value == questions[i].a){
+                    input.style.backgroundColor = my_colors.pistachio;
+                    headers[i].style.backgroundColor = my_colors.pistachio;
+                    num_correct++;
+                }
+                else{
+                    input.style.backgroundColor = my_colors.rose;
+                    headers[i].style.backgroundColor = my_colors.rose;
+                }
+                i++;
+            }
+            $("#score").html(`Score: ${num_correct}/${questions.length} : ${100*(num_correct / questions.length).toFixed(2)}%`);
+        }
+        $(document).ready(load);
+        $(window).on('hashchange', updateViews);
+    </script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+
+    <style>
+        .question-col, #new-item {
+            width: 200px;
+            height: 40px;
+            background-color: beige;
+            border: 1px solid black;
+            border-collapse: collapse; 
+        }
+        .quiz-item{
+            width: max-content;
+        }
+        #quiz-table {
+            padding-left: 0.0em;
+        }
+        #quiz-admin-page{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="quiz-header">Quizzer</h1>
+    <h2 id="quiz-title">Quiz</h2>
+    <div id="quiz-page">
+        <p id="score">Score:</p>
+        <ol id="quiz-list"></ol>
+        <button onclick="checkAnswers()">Check</button>
+        <button onclick="reset()">Reset</button>
+    </div>
+    <div id="quiz-admin-page">
+        <table id="quiz-table"></table>
+        <button onclick="createQuizItem()">Add</button>
+        <button onclick="submit()">Save</button>
+    </div>
+    <button id="mode-button" onclick="toggleAdminMode()">Admin</button>
+</body>
+</html>
