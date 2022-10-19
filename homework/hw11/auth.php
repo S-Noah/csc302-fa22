@@ -1,17 +1,17 @@
 <?php
 header('Content-type: application/json');
 
-function keys_exist($required){
-    foreach($required as $key){
-        if(!key_exists($key, $_POST)){
+function keys_exist($keys, $data){
+    foreach($keys as $key){
+        if(!key_exists($key, $data)){
             return false;
         }
     }
     return true;
 }
 
-function provided_credentials(){
-    if(keys_exist(array("username", "password"))){
+function provided_credentials($data){
+    if(keys_exist(array("username", "password"), $data)){
         return true;
     }
     else{
@@ -72,12 +72,12 @@ if(array_key_exists('action', $_POST)){
 function signup($data){
     // TODO: add code to check that username and password params are
     //       present.
-    if(provided_credentials()){
+    if(provided_credentials($data)){
         $password = $data['password'];
         $saltedHash = password_hash($password, PASSWORD_BCRYPT);
         addUser($data['username'], $saltedHash);
         echo json_encode(['success' => true]);
-    };
+    }
     
 }
 
@@ -92,7 +92,7 @@ function signup($data){
 function authenticate($data){
     // TODO: add code to check that username and password params are
     //       present.
-    if(provided_credentials()){
+    if(provided_credentials($data)){
         $userInfo = getUserByUsername($data['username']);
 
         if($userInfo != null && password_verify($data['password'], $userInfo['password'])){
