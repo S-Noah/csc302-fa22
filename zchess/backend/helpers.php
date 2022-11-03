@@ -7,6 +7,10 @@
  * 
  * @param $data The value to assign to the `data` field of the output.
  */
+function respond($data=[], $code=200){
+  http_response_code($code);
+  die(json_encode($data));
+}
 function success($data){
     $response = ['success' => true];
     if($data){
@@ -71,5 +75,15 @@ function success($data){
         return $array;
     }
     return null;
+  }
+  function queryTest($db, $query){
+    $result = $db->query($query);
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+          echo json_encode($row) . "<br>";
+        }
+      } else {
+        echo "0 results";
+      }
   }
 ?>

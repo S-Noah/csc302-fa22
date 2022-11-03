@@ -1,5 +1,5 @@
 <?php
-function handleRequest($routes){
+function handleRequest($routes, $d){
     // Initial request processing.
     // If this is being served from a public_html folder, find the prefix (e.g., 
     // /~jsmith/path/to/dir).
@@ -12,8 +12,9 @@ function handleRequest($routes){
         $uri = preg_replace("#^". $prefix ."/?#", "/", $_SERVER['REQUEST_URI']);
     } else {
         $prefix = "";
-        $uri = $_SERVER['REQUEST_URI'];
+        
     }
+    $uri = $_SERVER['REQUEST_URI'];
     // Get the request method; PHP doesn't handle non-GET or POST requests
     // well, so we'll mimic them with POST requests with a "_method" param
     // set to the method we want to use.
@@ -31,13 +32,14 @@ function handleRequest($routes){
         if($method == $route["method"]){
             preg_match($route["pattern"], $uri, $match);
             if($match){
-                success(json_encode($route["controller"]($uri, $match, $params)));
+                $route["controller"]($uri, $match, $params);
                 $foundMatchingRoute = true;
+                break;
             }
         }
     }
     if(!$foundMatchingRoute){
-        error("No route found for: $method $uri");
+        respond(['msg'=>"No route found for: $method $uri", "data"=>json_encode($d)], 404);
     }
 }
 /**

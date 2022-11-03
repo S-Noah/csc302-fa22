@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple API demo</title>
+    <style>
+        table, tr, td, th {
+            border: 1px solid gray;
+        }
+
+        .output {
+            width: 80em;
+            height: 10em;
+        }
+
+        .highlight {
+            border: 2px solid lightgreen;
+        }
+
+        .error {
+            border-color: red;
+        }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        function test(){
+            request_data = {
+                TEST:"FRONTEND WORKING"
+            }
+            request_options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify(request_data)
+            };
+            fetch("http://127.0.0.1:1337/books", request_options)
+            .then((response) => response.json())
+            .then((data) => console.log(data));
+        }
+    </script>
+
+</head>
+<body>
+    <button onclick="test()">Test</button>
+</body>
+</html>

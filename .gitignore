@@ -1,3 +1,4 @@
 *.db
 class/*
-cred.json
+creds.json
+zchess/backend/index.html
