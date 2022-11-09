@@ -1,4 +1,6 @@
-*.db
-class/*
+.env
+node_modules
+package.json
+package-lock.json
+tester.py
 creds.json
-zchess/backend/index.html
